@@ -9,7 +9,7 @@ module.exports = {
   externalsPresets: { node: true },
   externals: [nodeExternals()],
   entry: [
-    './src/AutoCompleteTextField'
+    './src/AutoCompleteTextField.tsx'
   ],
   output: {
     path: path.join(__dirname, 'dist'),
@@ -27,6 +27,8 @@ module.exports = {
   ],
   module: {
     rules: [
+      { test: /\.js$/, loader: "source-map-loader", enforce: "pre" },
+      { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
       { test: /\.js?$/, use: ['babel-loader'], exclude: /node_modules/ },
       { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'], exclude: /node_modules/ }
     ]

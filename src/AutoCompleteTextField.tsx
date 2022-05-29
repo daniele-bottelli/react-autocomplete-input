@@ -14,69 +14,78 @@ const KEY_TAB = 9;
 const OPTION_LIST_Y_OFFSET = 10;
 const OPTION_LIST_MIN_WIDTH = 100;
 
-const propTypes = {
-  Component: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.elementType,
-  ]),
-  defaultValue: PropTypes.string,
-  disabled: PropTypes.bool,
-  maxOptions: PropTypes.number,
-  onBlur: PropTypes.func,
-  onChange: PropTypes.func,
-  onChangeAdapter: PropTypes.func,
-  onKeyDown: PropTypes.func,
-  onRequestOptions: PropTypes.func,
-  onSelect: PropTypes.func,
-  changeOnSelect: PropTypes.func,
-  options: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.arrayOf(PropTypes.string),
-  ]),
-  regex: PropTypes.string,
-  matchAny: PropTypes.bool,
-  minChars: PropTypes.number,
-  requestOnlyIfNoOptions: PropTypes.bool,
-  spaceRemovers: PropTypes.arrayOf(PropTypes.string),
-  spacer: PropTypes.string,
-  trigger: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string),
-  ]),
-  value: PropTypes.string,
-  offsetX: PropTypes.number,
-  offsetY: PropTypes.number,
-  passThroughEnter: PropTypes.bool,
-};
+interface IAutocompleteTextFieldProps {
+  Component: string | any
+  defaultValue: string
+  disabled: boolean
+  maxOptions: number
+  onBlur: () => void
+  onChange: (value: string) => void
+  onChangeAdapter: (e: any, ref: React.RefObject<HTMLInputElement>) => Partial<React.ChangeEvent<HTMLInputElement>>
+  onKeyDown: (event: React.KeyboardEvent) => void
+  onRequestOptions: (part: string) => void
+  onSelect: (value: string) => void
+  changeOnSelect: (trigger: string, slug: string) => string
+  options: string[] | any
+  regex: string
+  matchAny: boolean
+  minChars: number
+  requestOnlyIfNoOptions: boolean
+  spaceRemovers: string[]
+  spacer: string
+  trigger: string | string[]
+  value: string
+  offsetX: number
+  offsetY: number
+  passThroughEnter: boolean
+}
 
-const defaultProps = {
-  Component: 'textarea',
-  defaultValue: '',
-  disabled: false,
-  maxOptions: 6,
-  onBlur: () => {},
-  onChange: () => {},
-  onChangeAdapter: e => e,
-  onKeyDown: () => {},
-  onRequestOptions: () => {},
-  onSelect: () => {},
-  changeOnSelect: (trigger, slug) => trigger + slug,
-  options: [],
-  regex: '^[A-Za-z0-9\\-_]+$',
-  matchAny: false,
-  minChars: 0,
-  requestOnlyIfNoOptions: true,
-  spaceRemovers: [',', '.', '!', '?'],
-  spacer: ' ',
-  trigger: '@',
-  offsetX: 0,
-  offsetY: 0,
-  value: null,
-  passThroughEnter: false,
-};
+interface IAutocompleteTextFieldState {
+  helperVisible: boolean
+  left: number
+  trigger: null | string
+  matchLength: number
+  matchStart: number
+  options: string[]
+  selection: number
+  top: number
+  value: null | string
+  caret: number
+}
 
-class AutocompleteTextField extends React.Component {
-  constructor(props) {
+class AutocompleteTextField extends React.Component<IAutocompleteTextFieldProps, IAutocompleteTextFieldState> {
+
+  private refInput: React.RefObject<HTMLInputElement>
+  private recentValue: string
+  private enableSpaceRemovers: boolean
+
+  static defaultProps: IAutocompleteTextFieldProps = {
+    Component: 'textarea',
+    defaultValue: '',
+    disabled: false,
+    maxOptions: 6,
+    onBlur: () => {},
+    onChange: () => {},
+    onChangeAdapter: e => e,
+    onKeyDown: () => {},
+    onRequestOptions: () => {},
+    onSelect: () => {},
+    changeOnSelect: (trigger, slug) => trigger + slug,
+    options: [],
+    regex: '^[A-Za-z0-9\\-_]+$',
+    matchAny: false,
+    minChars: 0,
+    requestOnlyIfNoOptions: true,
+    spaceRemovers: [',', '.', '!', '?'],
+    spacer: ' ',
+    trigger: '@',
+    offsetX: 0,
+    offsetY: 0,
+    value: null,
+    passThroughEnter: false,
+  }
+
+  constructor(props: IAutocompleteTextFieldProps) {
     super(props);
 
     this.isTrigger = this.isTrigger.bind(this);
@@ -102,11 +111,12 @@ class AutocompleteTextField extends React.Component {
       selection: 0,
       top: 0,
       value: null,
+      caret: 0,
     };
 
+    this.refInput = createRef<HTMLInputElement>()
     this.recentValue = props.defaultValue;
     this.enableSpaceRemovers = false;
-    this.refInput = createRef();
   }
 
   componentDidMount() {
@@ -126,13 +136,15 @@ class AutocompleteTextField extends React.Component {
     window.removeEventListener('resize', this.handleResize);
   }
 
-  getMatch(str, caret, providedOptions) {
+  getMatch(str: string, caret: number, providedOptions) {
     const { trigger, matchAny, regex } = this.props;
     const re = new RegExp(regex);
 
-    let triggers = trigger;
-    if (!Array.isArray(triggers)) {
+    let triggers: string [];
+    if (!Array.isArray(trigger)) {
       triggers = new Array(trigger);
+    } else {
+      triggers = trigger
     }
     triggers.sort();
 
@@ -212,7 +224,7 @@ class AutocompleteTextField extends React.Component {
     return slugData;
   }
 
-  arrayTriggerMatch(triggers, re) {
+  arrayTriggerMatch(triggers: string[], re: RegExp) {
     const triggersMatch = triggers.map((trigger) => ({
       triggerStr: trigger,
       triggerMatch: trigger.match(re),
@@ -222,7 +234,7 @@ class AutocompleteTextField extends React.Component {
     return triggersMatch;
   }
 
-  isTrigger(trigger, str, i) {
+  isTrigger(trigger: string, str: string, i: number) {
     if (!trigger || !trigger.length) {
       return true;
     }
@@ -234,14 +246,14 @@ class AutocompleteTextField extends React.Component {
     return false;
   }
 
-  handleChange(e) {
+  handleChange(e: any) {
     const {
       onChangeAdapter,
     } = this.props;
     this.handleChangeEvent(onChangeAdapter(e, this.refInput));
   }
 
-  handleChangeEvent(e) {
+  handleChangeEvent(e: Partial<React.ChangeEvent<HTMLInputElement>>) {
     const {
       onChange,
       options,
@@ -305,7 +317,7 @@ class AutocompleteTextField extends React.Component {
     return onChange(e.target.value);
   }
 
-  handleKeyDown(event) {
+  handleKeyDown(event: React.KeyboardEvent) {
     const { helperVisible, options, selection } = this.state;
     const { onKeyDown, passThroughEnter } = this.props;
 
@@ -344,7 +356,7 @@ class AutocompleteTextField extends React.Component {
     this.setState({ helperVisible: false });
   }
 
-  handleSelection(idx) {
+  handleSelection(idx: number) {
     const { spacer, onSelect, changeOnSelect } = this.props;
     const {
       matchStart, matchLength, options, trigger,
@@ -355,7 +367,7 @@ class AutocompleteTextField extends React.Component {
     const part1 = trigger.length === 0 ? '' : value.substring(0, matchStart - trigger.length);
     const part2 = value.substring(matchStart + matchLength);
 
-    const event = { target: this.refInput.current };
+    const event: Partial<React.ChangeEvent<HTMLInputElement>> = { target: this.refInput.current };
     const changedStr = changeOnSelect(trigger, slug);
 
     event.target.value = `${part1}${changedStr}${spacer}${part2}`;
@@ -369,11 +381,11 @@ class AutocompleteTextField extends React.Component {
     this.enableSpaceRemovers = true;
   }
 
-  updateCaretPosition(caret) {
+  updateCaretPosition(caret: number) {
     this.setState({ caret }, () => setCaretPosition(this.refInput.current, caret));
   }
 
-  updateHelper(str, caret, options) {
+  updateHelper(str: string, caret: number, options: string[]) {
     const input = this.refInput.current;
 
     const slug = this.getMatch(str, caret, options);
@@ -488,7 +500,8 @@ class AutocompleteTextField extends React.Component {
     const { value: stateValue } = this.state;
 
     const propagated = Object.assign({}, rest);
-    Object.keys(propTypes).forEach((k) => { delete propagated[k]; });
+    Object.keys(AutocompleteTextField.defaultProps).forEach((k) => { delete propagated[k]; });
+
 
     let val = '';
 
@@ -517,7 +530,6 @@ class AutocompleteTextField extends React.Component {
   }
 }
 
-AutocompleteTextField.propTypes = propTypes;
-AutocompleteTextField.defaultProps = defaultProps;
+// AutocompleteTextField.defaultProps = defaultProps;
 
 export default AutocompleteTextField;
