@@ -27,8 +27,21 @@ module.exports = {
   ],
   module: {
     rules: [
-      { test: /\.js$/, loader: "source-map-loader", enforce: "pre" },
-      { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
+            {
+                test: /\.(ts|tsx)$/,
+                exclude: /node_modules/,
+                resolve: {
+                    extensions: ['.ts', '.tsx', '.js', '.json'],
+                },
+                use: [
+                    {
+                        loader: 'ts-loader',
+                        options: {
+                            transpileOnly: true,
+                        },
+                    },
+                ],
+            },
       { test: /\.js?$/, use: ['babel-loader'], exclude: /node_modules/ },
       { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'], exclude: /node_modules/ }
     ]
