@@ -136,7 +136,7 @@ class AutocompleteTextField extends React.Component<IAutocompleteTextFieldProps,
     window.removeEventListener('resize', this.handleResize);
   }
 
-  getMatch(str: string, caret: number, providedOptions) {
+  getMatch(str: string, caret: number, providedOptions: string[] | any) {
     const { trigger, matchAny, regex } = this.props;
     const re = new RegExp(regex);
 

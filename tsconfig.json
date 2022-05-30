@@ -4,7 +4,10 @@
         "allowJs": true,
         "target": "es5",
         "esModuleInterop": true,
-        "jsx": "react"
+        "jsx": "react",
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true
     },
     "include": [
         "./src/**/*"
