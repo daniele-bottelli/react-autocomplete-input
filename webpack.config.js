@@ -27,21 +27,11 @@ module.exports = {
   ],
   module: {
     rules: [
-            {
-                test: /\.(ts|tsx)$/,
-                exclude: /node_modules/,
-                resolve: {
-                    extensions: ['.ts', '.tsx', '.js', '.json'],
-                },
-                use: [
-                    {
-                        loader: 'ts-loader',
-                        options: {
-                            transpileOnly: true,
-                        },
-                    },
-                ],
-            },
+      {
+          test: /\.(ts|tsx)$/,
+          exclude: /node_modules/,
+          use: [ { loader: 'ts-loader', options: { transpileOnly: true, }, }, ],
+      },
       { test: /\.js?$/, use: ['babel-loader'], exclude: /node_modules/ },
       { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'], exclude: /node_modules/ }
     ]
@@ -50,6 +40,7 @@ module.exports = {
     modules: [
       path.join(__dirname, 'src'),
       'node_modules'
-    ]
+    ],
+    extensions: ['.ts', '.tsx', '.js', '.json']
   }
 };
