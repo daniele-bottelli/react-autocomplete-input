@@ -7,6 +7,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -25,7 +27,11 @@ var __assign = (this && this.__assign) || function () {
 };
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -97,7 +103,7 @@ var AutocompleteTextField = /** @class */ (function (_super) {
             value: null,
             caret: 0,
         };
-        _this.refInput = react_1.createRef();
+        _this.refInput = (0, react_1.createRef)();
         _this.recentValue = props.defaultValue;
         _this.enableSpaceRemovers = false;
         return _this;
@@ -176,7 +182,9 @@ var AutocompleteTextField = /** @class */ (function (_super) {
                     if (slugData === null) {
                         slugData = {
                             trigger: currTrigger,
-                            matchStart: matchStart, matchLength: matchLength, options: options,
+                            matchStart: matchStart,
+                            matchLength: matchLength,
+                            options: options,
                         };
                     }
                     else {
@@ -218,7 +226,7 @@ var AutocompleteTextField = /** @class */ (function (_super) {
         var _a = this.props, onChange = _a.onChange, options = _a.options, spaceRemovers = _a.spaceRemovers, spacer = _a.spacer, value = _a.value;
         var old = this.recentValue;
         var str = e.target.value;
-        var caret = get_input_selection_1.default(e.target).end;
+        var caret = (0, get_input_selection_1.default)(e.target).end;
         if (!str.length) {
             this.setState({ helperVisible: false });
         }
@@ -236,7 +244,7 @@ var AutocompleteTextField = /** @class */ (function (_super) {
                         && spaceRemovers.indexOf(str[i - 2]) === -1
                         && spaceRemovers.indexOf(str[i]) !== -1
                         && this.getMatch(str.substring(0, i - 2), caret - 3, options)) {
-                        var newValue = ("" + str.slice(0, i - 1) + str.slice(i, i + 1) + str.slice(i - 1, i) + str.slice(i + 1));
+                        var newValue = ("".concat(str.slice(0, i - 1)).concat(str.slice(i, i + 1)).concat(str.slice(i - 1, i)).concat(str.slice(i + 1)));
                         this.updateCaretPosition(i + 1);
                         this.refInput.current.value = newValue;
                         if (!value) {
@@ -303,7 +311,7 @@ var AutocompleteTextField = /** @class */ (function (_super) {
         var part2 = value.substring(matchStart + matchLength);
         var event = { target: this.refInput.current };
         var changedStr = changeOnSelect(trigger, slug);
-        event.target.value = "" + part1 + changedStr + spacer + part2;
+        event.target.value = "".concat(part1).concat(changedStr).concat(spacer).concat(part2);
         this.handleChangeEvent(event);
         onSelect(event.target.value);
         this.resetHelper();
@@ -312,13 +320,13 @@ var AutocompleteTextField = /** @class */ (function (_super) {
     };
     AutocompleteTextField.prototype.updateCaretPosition = function (caret) {
         var _this = this;
-        this.setState({ caret: caret }, function () { return get_input_selection_1.setCaretPosition(_this.refInput.current, caret); });
+        this.setState({ caret: caret }, function () { return (0, get_input_selection_1.setCaretPosition)(_this.refInput.current, caret); });
     };
     AutocompleteTextField.prototype.updateHelper = function (str, caret, options) {
         var input = this.refInput.current;
         var slug = this.getMatch(str, caret, options);
         if (slug) {
-            var caretPos = textarea_caret_1.default(input, caret);
+            var caretPos = (0, textarea_caret_1.default)(input, caret);
             var rect = input.getBoundingClientRect();
             var top_1 = caretPos.top + input.offsetTop;
             var left = Math.min(caretPos.left + input.offsetLeft - OPTION_LIST_Y_OFFSET, input.offsetLeft + rect.width - OPTION_LIST_MIN_WIDTH);
@@ -327,8 +335,7 @@ var AutocompleteTextField = /** @class */ (function (_super) {
                 && (slug.options.length > 1
                     || (slug.options.length === 1
                         && slug.options[0].length !== slug.matchLength))) {
-                this.setState(__assign({ helperVisible: true, top: top_1,
-                    left: left }, slug));
+                this.setState(__assign({ helperVisible: true, top: top_1, left: left }, slug));
             }
             else {
                 if (!requestOnlyIfNoOptions || !slug.options.length) {
@@ -384,8 +391,7 @@ var AutocompleteTextField = /** @class */ (function (_super) {
             val = defaultValue;
         }
         return (react_1.default.createElement(react_1.default.Fragment, null,
-            react_1.default.createElement(Component, __assign({ disabled: disabled,
-                onBlur: onBlur, onChange: this.handleChange, onKeyDown: this.handleKeyDown, ref: this.refInput, value: val }, propagated)),
+            react_1.default.createElement(Component, __assign({ disabled: disabled, onBlur: onBlur, onChange: this.handleChange, onKeyDown: this.handleKeyDown, ref: this.refInput, value: val }, propagated)),
             this.renderAutocompleteList()));
     };
     AutocompleteTextField.defaultProps = {
