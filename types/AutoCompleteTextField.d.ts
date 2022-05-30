@@ -1,7 +1,7 @@
 import React from 'react';
 import './AutoCompleteTextField.css';
 interface IAutocompleteTextFieldProps {
-    Component: string | any;
+    Component: React.ElementType;
     defaultValue: string;
     disabled: boolean;
     maxOptions: number;

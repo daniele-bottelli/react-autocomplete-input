@@ -1,5 +1,4 @@
 import React, { createRef } from 'react';
-import PropTypes from 'prop-types';
 import getCaretCoordinates from 'textarea-caret';
 import getInputSelection, { setCaretPosition } from 'get-input-selection';
 import './AutoCompleteTextField.css';
@@ -15,7 +14,7 @@ const OPTION_LIST_Y_OFFSET = 10;
 const OPTION_LIST_MIN_WIDTH = 100;
 
 interface IAutocompleteTextFieldProps {
-  Component: string | any
+  Component: React.ElementType
   defaultValue: string
   disabled: boolean
   maxOptions: number
@@ -515,15 +514,16 @@ class AutocompleteTextField extends React.Component<IAutocompleteTextFieldProps,
 
     return (
       <>
-        <Component
-          disabled={disabled}
-          onBlur={onBlur}
-          onChange={this.handleChange}
-          onKeyDown={this.handleKeyDown}
-          ref={this.refInput}
-          value={val}
-          {...propagated}
-        />
+        {React.createElement(Component, 
+        {
+          disabled,
+          onBlur,
+          onChange: this.handleChange,
+          onKeyDown: this.handleKeyDown,
+          ref: this.refInput,
+          value: val,
+          ...propagated,
+        })}
         {this.renderAutocompleteList()}
       </>
     );

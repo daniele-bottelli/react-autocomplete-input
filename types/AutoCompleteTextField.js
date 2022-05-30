@@ -384,7 +384,8 @@ var AutocompleteTextField = /** @class */ (function (_super) {
             val = defaultValue;
         }
         return (react_1.default.createElement(react_1.default.Fragment, null,
-            react_1.default.createElement(Component, __assign({ disabled: disabled, onBlur: onBlur, onChange: this.handleChange, onKeyDown: this.handleKeyDown, ref: this.refInput, value: val }, propagated)),
+            react_1.default.createElement(Component, __assign({ disabled: disabled,
+                onBlur: onBlur, onChange: this.handleChange, onKeyDown: this.handleKeyDown, ref: this.refInput, value: val }, propagated)),
             this.renderAutocompleteList()));
     };
     AutocompleteTextField.defaultProps = {
