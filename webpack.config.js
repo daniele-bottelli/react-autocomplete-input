@@ -9,7 +9,7 @@ module.exports = {
   externalsPresets: { node: true },
   externals: [nodeExternals()],
   entry: [
-    './src/AutoCompleteTextField.tsx'
+    './src/index.ts'
   ],
   output: {
     path: path.join(__dirname, 'dist'),
